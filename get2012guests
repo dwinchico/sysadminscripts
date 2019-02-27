@@ -1,0 +1,17 @@
+# Get-Module -ListAvailable | Import-Module
+# $cred = Get-Credential
+
+Connect-VIServer -Server virtualcenter1 -Protocol https -Credential $cred 
+$vms=Get-VM
+
+$Output = Foreach ($vm in $vms)
+
+{
+if ((Get-View $vm).Guest.GuestFullName -match "Windows Server 2012")
+{
+  "" | Select @{N="Name";E={$VM.Name}},@{N="Hostname";E={$VM.Guest.HostName}},
+    @{N="Domain";E={$Domain = $VM.Guest.HostName -Split'\.'
+    ($Domain[1..($Domain.Count)] -Join'.').ToLower()}}
+    }
+}
+$Output | Export-CSV -Path C:\Windows2012VM20170515.csv -NoTypeInformation 
